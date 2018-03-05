@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Socket.IO Latency</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   </head>
   <body>
     <h1>Socket.IO Latency <span id="latency"></span></h1>
@@ -10,9 +11,48 @@
     <h2 id="transport">(connecting)</h2>
     <canvas id="chart" height="200"></canvas>
 
+    <h2>REsimler</h2>
+    <div style="widht: 100%">
+
+    <div class="row">
+      <div class="col-xs-3">
+
+      </div>
+      <div class="col-xs-6">
+        <div id="dataset" style="display: flex; flex-direction: row; flex-wrap: wrap;justify-content: center">
+
+
+        </div>
+
+      </div>
+      <div class="col-xs-3">
+
+      </div>
+    </div>
+  </div>
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+    <script>
+      fetch('http://localhost:8000/get')
+      .then(resp => resp.json())
+      .then(function(data) {
+        data.map((d, i) => {
+          $("#dataset").append(`
+          <div style="display: flex; flex-direction: column;">
+            "${d.args.id}"
+            <img src="${d.image}"/>
+          </div>
+          `)
+        }
+        )
+      })
+
+    </script>
     <script>
       // socket
       var socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -25,7 +65,7 @@
           send();
       });
       socket.on('pong_from_server', function(data) {
-          console.log(data);
+          // console.log(data);
           var latency = new Date - data.time;
           $('#latency').text(latency + 'ms');
           $('#mem_total').text(data.MemTotal)

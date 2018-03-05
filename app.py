@@ -3,9 +3,10 @@ from sanic import Sanic
 from sanic.response import html
 from sanic.response import json as sjson
 import socketio
-import json, time
+import json, time, random
 import os, time, asyncio
-from bulk_fetch import collect
+from bulk_fetch import fetch
+import aiohttp
 
 
 class AFileStream(object):
@@ -49,8 +50,11 @@ fs = AFileStream("/proc/meminfo")
 #         return web.Response(text=f.read(), content_type='text/html')
 
 @app.route('/get/')
-def index(request):
-    return sjson({"hello": "mama"})
+async def index(request):
+    async with aiohttp.ClientSession() as sess:
+        data = asyncio.gather(*[fetch(sess, 'http://httpbin.org/get?id={}'.format(link)) for link in range(10000)])
+        return sjson(await data)
+
 
 @app.route('/')
 def index(request):
